@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="apple-mobile-web-app-title" content="Quiet" />
+<meta name="theme-color" content="#000000" />
+<title>Quiet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    font-family: 'Iowan Old Style', 'Palatino', 'Georgia', serif;
+    background: #000000;
+    color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    position: relative;
+  }
+  .wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  }
+  header {
+    padding: 56px 36px 0;
+  }
+  .date {
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: #888;
+    text-transform: lowercase;
+    font-style: italic;
+  }
+  .time {
+    font-size: 64px;
+    line-height: 1;
+    margin-top: 10px;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    color: #ffffff;
+  }
+  .rule {
+    width: 48px;
+    height: 1px;
+    background: #555;
+    margin-top: 24px;
+    opacity: 0.7;
+  }
+  main {
+    flex: 1;
+    padding: 28px 36px 16px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .item {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    padding: 19px 0;
+    text-align: left;
+    font-family: inherit;
+    font-size: 22px;
+    color: #ffffff;
+    cursor: pointer;
+    letter-spacing: 0.005em;
+    font-weight: 400;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:active {
+    opacity: 0.4;
+    transform: translateX(6px);
+  }
+  .item .num {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+  }
+  footer {
+    padding: 16px 36px 32px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: #555;
+    text-transform: uppercase;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="date" id="date">—</div>
+      <div class="time" id="time">—</div>
+      <div class="rule"></div>
+    </header>
+    <main id="list"></main>
+    <footer>— quiet mode —</footer>
+  </div>
+
+<script>
+  const apps = [
+    { name: "Messages", url: "messages://" },
+    { name: "Phone", url: "mobilephone://" },
+    { name: "Clock", url: "clock-alarm://" },
+    { name: "Snapchat", url: "snapchat://" },
+    { name: "Email — Personal", url: "googlegmail://" },
+    { name: "Email — Work", url: "ms-outlook://" },
+    { name: "Music", url: "spotify://" },
+  ];
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function updateClock() {
+    const d = new Date();
+    let h = d.getHours();
+    const m = pad(d.getMinutes());
+    const ampm = h >= 12 ? "pm" : "am";
+    h = h % 12 || 12;
+    document.getElementById("time").textContent = `${h}:${m}${ampm}`;
+    document.getElementById("date").textContent = d.toLocaleDateString([], {
+      weekday: "long", month: "long", day: "numeric"
+    });
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  const list = document.getElementById("list");
+  apps.forEach((app, i) => {
+    const btn = document.createElement("button");
+    btn.className = "item";
+    btn.innerHTML = `<span>${app.name}</span><span class="num">${pad(i + 1)}</span>`;
+    btn.onclick = () => { window.location.href = app.url; };
+    list.appendChild(btn);
+  });
+</script>
+</body>
+</html>
